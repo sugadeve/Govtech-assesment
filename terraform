@@ -1,0 +1,188 @@
+# Create VPC/Subnet/Security Group
+provider "aws" {
+  version = "~> 2.0"
+  access_key = AKIAIZW54XZXIYUK6XJQ
+  secret_key = wHzj2f8fb4UrfdZb2783TFYFGohRfAvmVmZqDBFuy 
+  region     = ap-southeast1
+}
+=========================================
+# create the VPC
+resource "aws_vpc" "Test_VPC" {
+  cidr_block           = 10.0.0.0/16
+  instance_tenancy     = deafault 
+  
+tags = {
+    Name = "Test VPC"
+}
+} # end resource
+=======================================
+# create the Subnet
+resource "aws_subnet" "WEB_Subnet1" {
+  vpc_id                  = aws_1234567
+  cidr_block              = 10.0.0.0/16
+  map_public_ip_on_launch = map public ip
+  availability_zone       = ap-southeast1
+tags = {
+   Name = "WEB_Subnet1"
+}
+resource "aws_subnet" "DB_Subnet2" {
+  vpc_id                  = aws_1234567
+  cidr_block              = 10.0.0.0/16
+  map_public_ip_on_launch = mapPublicIP 
+  availability_zone       = ap-southeast1
+tags = {
+   Name = "DB_Subnet2"
+
+resource "aws_db_subnet_group" "default" {
+  name       = "main"
+  subnet_ids = [aws_subnet.frontend.id, aws_subnet.backend.id]
+
+  tags = {
+    Name = "My DB subnet group"
+  }
+}
+}
+} # end resource
+========================================
+Create eip
+
+=========================================
+# Create the Security Group
+resource "aws_security_group" "My_EC2_Security_Group" {
+  vpc_id       = aws_1234567
+  name         = "EC2 Security Group"
+  description  = "EC2 Security Group"
+  
+  # allow ingress of port 
+  ingress {
+    cidr_blocks = 10.0.0.0/16
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+  } 
+  
+  # allow egress of all ports
+  egress {
+    from_port   = 80
+    to_port     = 1433
+    protocol    = "-1"
+    cidr_blocks = "10.0.0.0/16
+  }
+tags = {
+   Name = "My EC2 Security Group"
+   Description = "My EC2 Security Group"
+}
+} # end resource
+==========================================
+
+# Create the EC2(WEBServer) Instance
+provider "aws" {
+region = "ap-southeastasia1"
+shared_credentials_file = "c:/Users/admin/.aws/credentials"
+resource "aws_instance"  {
+ami = "ami-0c09927662c939f41"
+instance_type = "t2.micro"
+tags { name = "WEBSERVER"}"
+data "aws_availability_zone" "example" {
+  name = "ap-southeast-1"
+provider "aws" {
+region = "ap-southeastasia1"
+shared_credentials_file = "c:/Users/admin/.aws/credentials"
+resource "aws_instance"  {
+ami = "ami-0c09927662c939f41"
+instance_type = "t2.micro"
+tags { name = "WEBSERVER"}
+data "aws_availability_zone" "example" {
+  name = "ap-southeast-2"
+}
+} # end resource
+=======================================
+#Create the Loadbalancer" 
+name = "my-alb"
+
+load_balancer_type = "application"
+vpc_id             = "TestVPC"
+subnets            = ["My Test Subnet1", "My Test Subnet2"]
+security_groups    = ["sg-abc12345", "sg-def78932"]
+access_logs = {
+bucket = "my-alb-logs"
+}
+target_groups = [
+{
+name_prefix      = "pref-"
+backend_protocol = "HTTPS"
+backend_port     = 80
+target_type      = "instance"
+}
+https_listeners = [
+{
+port               = 443
+protocol           = "HTTPS"
+certificate_arn    = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+target_group_index = 0
+}
+
+http_tcp_listeners = [
+{
+port               = 80
+protocol           = "HTTP"
+target_group_index = 0
+}
+ 
+tags = {
+Environment = "Test"
+}
+}
+======================================================
+# Create the RDS
+resource "aws_db_instance" "testrds1" {
+  allocated_storage    = 100
+  db_subnet_group_name = "db-subnetgrp"
+  engine               = "sql"
+  engine_version       = "11.5"
+  identifier           = "testrds"
+  instance_class       = "db.m5.large"
+  password             = "password"
+  skip_final_snapshot  = true
+  storage_encrypted    = true
+  username             = "administrator"
+resource "aws_db_instance" "testrds2" {
+  allocated_storage    = 100
+  db_subnet_group_name = "db-subnetgrp"
+  engine               = "sql"
+  engine_version       = "11.5"
+  identifier           = "testrds"
+  instance_class       = "db.m5.large"
+  password             = "password"
+  skip_final_snapshot  = true
+  storage_encrypted    = true
+  username             = "administrator"
+}
+} # end resource
+================================================
+# Create Autoscaling Group
+
+
+  namespace   = EC2 Autoscaling Group
+  environment = production
+  name        = EC2ASG
+
+  image_id                    = "ami-12345678"
+  instance_type               = "t2.small"
+  security_group_ids          = ["My EC2 Security Group"]
+  subnet_ids                  = ["WEB_Subnet1"]
+  health_check_type           = "EC2"
+  min_size                    = 2
+  max_size                    = 3
+  wait_for_capacity_timeout   = "5m"
+  associate_public_ip_address = true
+  user_data_base64            = "${base64encode(local.userdata)}"
+
+
+  # Auto-scaling policies and CloudWatch metric alarms
+  autoscaling_policies_enabled           = "true"
+  cpu_utilization_high_threshold_percent = "70"
+  cpu_utilization_low_threshold_percent  = "20"
+}
+} # end resource
+===============================================
